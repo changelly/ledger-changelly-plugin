@@ -1,0 +1,57 @@
+{
+  "chainId": 56,
+  "contracts": [
+    {
+      "address": "0x6018b292fddeaa83bb5d7b85415270b4fc6d0c12",
+      "contractName": "Changelly DEX",
+      "selectors": {
+        "0x415565b0": {
+          "erc20OfInterest": ["inputToken", "outputToken"],
+          "method": "transformERC20",
+          "plugin": "changelly"
+        },
+        "0x97b3c273": {
+          "erc20OfInterest": ["tokenIn", "tokenOut"],
+          "method": "aggRouterSwap",
+          "plugin": "changelly"
+        },
+        "0xef28e668": {
+          "erc20OfInterest": ["tokenIn", "tokenOut"],
+          "method": "aggRouterSwapWithFee",
+          "plugin": "changelly"
+        },
+        "0xd9627aa4": {
+          "erc20OfInterest": ["tokens.0", "tokens.1"],
+          "method": "sellToUniswap",
+          "plugin": "changelly"
+        },
+        "0xf7fcd384": {
+          "erc20OfInterest": ["inputToken", "outputToken"],
+          "method": "sellToLiquidityProvider",
+          "plugin": "changelly"
+        },
+        "0x3598d8ab": {
+          "erc20OfInterest": [],
+          "method": "sellEthForTokenToUniswapV3",
+          "plugin": "changelly"
+        },
+        "0x803ba26d": {
+          "erc20OfInterest": [],
+          "method": "sellTokenForEthToUniswapV3",
+          "plugin": "changelly"
+        },
+        "0xc43c9ef6": {
+          "erc20OfInterest": ["tokens.0", "tokens.1"],
+          "method": "sellToPancakeSwap",
+          "plugin": "changelly"
+        },
+        "0x6af479b2": {
+          "erc20OfInterest": [],
+          "method": "sellTokenForTokenToUniswapV3",
+          "plugin": "changelly"
+        }
+      }
+    }
+  ],
+  "name": "changelly"
+}
