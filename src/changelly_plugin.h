@@ -1,10 +1,12 @@
 #pragma once
 
-#include "eth_internals.h"
-#include "eth_plugin_interface.h"
 #include <string.h>
 
-// Number of selectors defined in this plugin. Should match the enum `selector_t`.
+#include "eth_internals.h"
+#include "eth_plugin_interface.h"
+
+// Number of selectors defined in this plugin. Should match the enum
+// `selector_t`.
 #define NUM_SELECTORS 9
 
 // Name of the plugin.
@@ -13,8 +15,8 @@
 // Changelly uses `0xeeeee` as a dummy address to represent ETH.
 extern const uint8_t NATIVE_TOKEN_ADDRESS[ADDRESS_LENGTH];
 
-// Returns 1 if corresponding address is the Changelly address for the chain token (ETH, BNB, MATIC,
-// etc.. are 0xeeeee...).
+// Returns 1 if corresponding address is the Changelly address for the chain
+// token (ETH, BNB, MATIC, etc.. are 0xeeeee...).
 #define ADDRESS_IS_NETWORK_TOKEN(_addr) (!memcmp(_addr, NATIVE_TOKEN_ADDRESS, ADDRESS_LENGTH))
 
 #define TOKEN_SENT_FOUND     1
@@ -64,8 +66,8 @@ typedef struct context_t {
     // For parsing data.
     uint8_t next_param;  // Set to be the next param we expect to parse.
     uint16_t offset;     // Offset at which the array or struct starts.
-    bool go_to_offset;   // If set, will force the parsing to iterate through parameters until
-                         // `offset` is reached.
+    bool go_to_offset;   // If set, will force the parsing to iterate through
+                         // parameters until `offset` is reached.
 
     // For both parsing and display.
     selector_t selectorIndex;
@@ -84,8 +86,8 @@ typedef enum {
 // Ticker used when the token wasn't found in the CAL.
 #define DEFAULT_TICKER ""
 
-// Piece of code that will check that the above structure is not bigger than 5 * 32. Do not remove
-// this check.
+// Piece of code that will check that the above structure is not bigger than 5
+// * 32. Do not remove this check.
 _Static_assert(sizeof(context_t) <= 5 * 32, "Structure of parameters too big.");
 
 void handle_provide_parameter(void *parameters);

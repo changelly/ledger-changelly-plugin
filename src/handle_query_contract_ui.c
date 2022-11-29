@@ -49,7 +49,8 @@ static void set_warning_ui(ethQueryContractUI_t *msg,
     strlcpy(msg->msg, "Unknown token", msg->msgLength);
 }
 
-// Helper function that returns the enum corresponding to the screen that should be displayed.
+// Helper function that returns the enum corresponding to the screen that should
+// be displayed.
 static screens_t get_screen(const ethQueryContractUI_t *msg, const context_t *context) {
     uint8_t index = msg->screenIndex;
 

@@ -19,10 +19,9 @@
 #include <stdint.h>
 #include <string.h>
 
-#include "os.h"
-#include "cx.h"
-
 #include "changelly_plugin.h"
+#include "cx.h"
+#include "os.h"
 
 // NATIVE TOKEN ADDRESS
 const uint8_t NATIVE_TOKEN_ADDRESS[ADDRESS_LENGTH] = {0xee, 0xee, 0xee, 0xee, 0xee, 0xee, 0xee,
@@ -105,7 +104,8 @@ __attribute__((section(".boot"))) int main(int arg0) {
     // Ensure exception will work as planned
     os_boot();
 
-    // Try catch block. Please read the docs for more information on how to use those!
+    // Try catch block. Please read the docs for more information on how to use
+    // those!
     BEGIN_TRY {
         TRY {
             // Low-level black magic.
@@ -120,8 +120,9 @@ __attribute__((section(".boot"))) int main(int arg0) {
                 // Not called from dashboard: called from the ethereum app!
                 const unsigned int *args = (const unsigned int *) arg0;
 
-                // If `ETH_PLUGIN_CHECK_PRESENCE` is set, this means the caller is just trying to
-                // know whether this app exists or not. We can skip `dispatch_plugin_calls`.
+                // If `ETH_PLUGIN_CHECK_PRESENCE` is set, this means the caller is just
+                // trying to know whether this app exists or not. We can skip
+                // `dispatch_plugin_calls`.
                 if (args[0] != ETH_PLUGIN_CHECK_PRESENCE) {
                     dispatch_plugin_calls(args[0], (void *) args[1]);
                 }
