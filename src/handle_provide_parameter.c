@@ -210,8 +210,8 @@ static void handle_sell_to_uniswap(ethPluginProvideParameter_t *msg, context_t *
     }
 }
 
-static void handle_sell_eth_for_token_to_uniswap_v3(
-    ethPluginProvideParameter_t *msg, context_t *context) {
+static void handle_sell_eth_for_token_to_uniswap_v3(ethPluginProvideParameter_t *msg,
+                                                    context_t *context) {
     switch (context->next_param) {
         case OFFSET:
             fill_input_token_as_eth(context);
@@ -232,8 +232,8 @@ static void handle_sell_eth_for_token_to_uniswap_v3(
     }
 }
 
-static void handle_sell_token_for_eth_uniswap_v3(
-    ethPluginProvideParameter_t *msg, context_t *context) {
+static void handle_sell_token_for_eth_uniswap_v3(ethPluginProvideParameter_t *msg,
+                                                 context_t *context) {
     switch (context->next_param) {
         case OFFSET:
             context->next_param = INPUT_AMOUNT;
@@ -258,8 +258,8 @@ static void handle_sell_token_for_eth_uniswap_v3(
     }
 }
 
-static void handle_sell_token_for_token_uniswap_v3(
-    ethPluginProvideParameter_t *msg, context_t *context) {
+static void handle_sell_token_for_token_uniswap_v3(ethPluginProvideParameter_t *msg,
+                                                   context_t *context) {
     switch (context->next_param) {
         case OFFSET:
             context->next_param = INPUT_AMOUNT;
@@ -287,8 +287,8 @@ void handle_provide_parameter(void *parameters) {
     ethPluginProvideParameter_t *msg = (ethPluginProvideParameter_t *) parameters;
     context_t *context = (context_t *) msg->pluginContext;
     // We use `%.*H`: it's a utility function to print bytes. You first give
-    // the number of bytes you wish to print (in this case, `PARAMETER_LENGTH`) and then
-    // the address (here `msg->parameter`).
+    // the number of bytes you wish to print (in this case, `PARAMETER_LENGTH`)
+    // and then the address (here `msg->parameter`).
     PRINTF("Changelly plugin provide parameter: offset %d\nBytes: %.*H\n",
            msg->parameterOffset,
            PARAMETER_LENGTH,

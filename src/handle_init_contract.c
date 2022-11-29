@@ -12,7 +12,8 @@ static int find_selector(uint32_t selector, const uint32_t *selectors, size_t n,
 
 // Called once to init.
 void handle_init_contract(void *parameters) {
-    // Cast the msg to the type of structure we expect (here, ethPluginInitContract_t).
+    // Cast the msg to the type of structure we expect (here,
+    // ethPluginInitContract_t).
     ethPluginInitContract_t *msg = (ethPluginInitContract_t *) parameters;
 
     // Make sure we are running a compatible version.
@@ -22,8 +23,8 @@ void handle_init_contract(void *parameters) {
         return;
     }
 
-    // Double check that the `context_t` struct is not bigger than the maximum size (defined by
-    // `msg->pluginContextLength`).
+    // Double check that the `context_t` struct is not bigger than the maximum
+    // size (defined by `msg->pluginContextLength`).
     if (msg->pluginContextLength < sizeof(context_t)) {
         PRINTF("Plugin parameters structure is bigger than allowed size\n");
         msg->result = ETH_PLUGIN_RESULT_ERROR;
