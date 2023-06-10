@@ -1,4 +1,3 @@
-import 'core-js/stable';
 import { ethers } from 'ethers';
 import { parseEther } from 'ethers/lib/utils';
 import 'regenerator-runtime/runtime';

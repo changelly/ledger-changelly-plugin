@@ -1,4 +1,3 @@
-import 'core-js/stable';
 import { ethers } from 'ethers';
 import 'regenerator-runtime/runtime';
 import { waitForAppScreen, zemu, nano_models, genericTx } from './test.fixture';

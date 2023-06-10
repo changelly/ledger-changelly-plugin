@@ -27,7 +27,7 @@ const NANOS_PLUGIN_PATH = Resolve('elfs/plugin_nanos.elf');
 const NANOSP_PLUGIN_PATH = Resolve('elfs/plugin_nanosp.elf');
 const NANOX_PLUGIN_PATH = Resolve('elfs/plugin_nanox.elf');
 
-const nano_models: DeviceModel[] = [
+const nano_models = [
   { name: 'nanos', letter: 'S', path: NANOS_PLUGIN_PATH, eth_path: NANOS_ETH_PATH },
   { name: 'nanosp', letter: 'SP', path: NANOSP_PLUGIN_PATH, eth_path: NANOSP_ETH_PATH },
   { name: 'nanox', letter: 'X', path: NANOX_PLUGIN_PATH, eth_path: NANOX_ETH_PATH },
@@ -46,7 +46,11 @@ let genericTx = {
   data: null,
 };
 
-const TIMEOUT = 1000000;
+// beforeAll(async () => {
+//   await Zemu.checkAndPullImage();
+// });
+
+jest.setTimeout(1000 * 60 * 60); // 1 min
 
 // Generates a serializedTransaction from a rawHexTransaction copy pasted from etherscan.
 function txFromEtherscan(rawTx) {
@@ -79,7 +83,7 @@ function txFromEtherscan(rawTx) {
 
 function zemu(device, func, network = 'ethereum') {
   return async () => {
-    jest.setTimeout(TIMEOUT);
+    // jest.setTimeout(TIMEOUT);
     let elf_path;
     let lib_elf;
     elf_path = device.eth_path;

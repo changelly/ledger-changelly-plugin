@@ -136,6 +136,11 @@
   {
     "inputs": [
       {
+        "internalType": "address",
+        "name": "target",
+        "type": "address"
+      },
+      {
         "internalType": "bytes",
         "name": "callData",
         "type": "bytes"
@@ -157,11 +162,16 @@
       },
       {
         "internalType": "uint256",
-        "name": "tokenOutAmount",
+        "name": "minTokenOutAmount",
         "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "tokenOutRecipient",
+        "type": "address"
       }
     ],
-    "name": "aggRouterSwap",
+    "name": "sailAdapterSwap",
     "outputs": [],
     "stateMutability": "payable",
     "type": "function"
@@ -169,6 +179,11 @@
   {
     "inputs": [
       {
+        "internalType": "address",
+        "name": "target",
+        "type": "address"
+      },
+      {
         "internalType": "bytes",
         "name": "callData",
         "type": "bytes"
@@ -190,8 +205,13 @@
       },
       {
         "internalType": "uint256",
-        "name": "tokenOutAmount",
+        "name": "minTokenOutAmount",
         "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "tokenOutRecipient",
+        "type": "address"
       },
       {
         "internalType": "address payable",
@@ -199,111 +219,14 @@
         "type": "address"
       },
       {
-        "internalType": "uint16",
-        "name": "feePercentage",
-        "type": "uint16"
+        "internalType": "uint256",
+        "name": "feeAmount",
+        "type": "uint256"
       }
     ],
-    "name": "aggRouterSwapWithFee",
+    "name": "sailAdapterSwapWithFee",
     "outputs": [],
     "stateMutability": "payable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "bytes",
-        "name": "encodedPath",
-        "type": "bytes"
-      },
-      {
-        "internalType": "uint256",
-        "name": "minBuyAmount",
-        "type": "uint256"
-      },
-      {
-        "internalType": "address",
-        "name": "recipient",
-        "type": "address"
-      }
-    ],
-    "name": "sellEthForTokenToUniswapV3",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "buyAmount",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "payable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "bytes",
-        "name": "encodedPath",
-        "type": "bytes"
-      },
-      {
-        "internalType": "uint256",
-        "name": "sellAmount",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "minBuyAmount",
-        "type": "uint256"
-      },
-      {
-        "internalType": "address payable",
-        "name": "recipient",
-        "type": "address"
-      }
-    ],
-    "name": "sellTokenForEthToUniswapV3",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "buyAmount",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "bytes",
-        "name": "encodedPath",
-        "type": "bytes"
-      },
-      {
-        "internalType": "uint256",
-        "name": "sellAmount",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "minBuyAmount",
-        "type": "uint256"
-      },
-      {
-        "internalType": "address",
-        "name": "recipient",
-        "type": "address"
-      }
-    ],
-    "name": "sellTokenForTokenToUniswapV3",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "buyAmount",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -315,6 +238,56 @@
     ],
     "name": "sellToPancakeSwap",
     "outputs": [{ "internalType": "uint256", "name": "buyAmount", "type": "uint256" }],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address payable",
+        "name": "recipient",
+        "type": "address"
+      },
+      {
+        "internalType": "contract IERC20TokenV06",
+        "name": "inputToken",
+        "type": "address"
+      },
+      {
+        "internalType": "contract IERC20TokenV06",
+        "name": "outputToken",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "inputTokenAmount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "minOutputTokenAmount",
+        "type": "uint256"
+      },
+      {
+        "components": [
+          {
+            "internalType": "uint32",
+            "name": "deploymentNonce",
+            "type": "uint32"
+          },
+          {
+            "internalType": "bytes",
+            "name": "data",
+            "type": "bytes"
+          }
+        ],
+        "internalType": "struct ITransformERC20Feature.Transformation[]",
+        "name": "transformations",
+        "type": "tuple[]"
+      }
+    ],
+    "name": "anyRecipientTransformERC20",
+    "outputs": [],
     "stateMutability": "payable",
     "type": "function"
   }

@@ -6,7 +6,7 @@ This is a plugin for the Ethereum application which helps parsing and displaying
 
 install Docker and docker-compose
 
-1. `git clone https://github.com/LedgerHQ/app-ethereum`
+1. `git clone https://github.com/LedgerHQ/app-ethereum && cd app-ethereum && git checkout master`
 2. `git clone https://github.com/LedgerHQ/plugin-tools`
 3. `git clone https://github.com/LedgerHQ/ethereum-plugin-sdk`
 4. `cd plugin-tools && ./start.sh`
@@ -21,12 +21,11 @@ Need more information about the interface, the architecture, or general stuff ab
 
 Smart contracts covered by this plugin are:
 
-| Network  | Smart Contract Address                     |  
+| Network  | Smart Contract Address                     |
 | -------- | :----------------------------------------- |
 | Ethereum | 0x1AAAd07998466cD3Eb8140827DDdb37570BE1e63 |
 | BSC      | 0x6018B292fDDeAA83BB5d7B85415270B4Fc6d0C12 |
 | Polygon  | 0x8e4005c5a2F85408A95adF7831F9959edA7d87d1 |
-
 
 ## Tests
 

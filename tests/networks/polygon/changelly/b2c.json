@@ -10,16 +10,6 @@
           "method": "transformERC20",
           "plugin": "changelly"
         },
-        "0x97b3c273": {
-          "erc20OfInterest": ["tokenIn", "tokenOut"],
-          "method": "aggRouterSwap",
-          "plugin": "changelly"
-        },
-        "0xef28e668": {
-          "erc20OfInterest": ["tokenIn", "tokenOut"],
-          "method": "aggRouterSwapWithFee",
-          "plugin": "changelly"
-        },
         "0xd9627aa4": {
           "erc20OfInterest": ["tokens.0", "tokens.1"],
           "method": "sellToUniswap",
@@ -30,24 +20,19 @@
           "method": "sellToLiquidityProvider",
           "plugin": "changelly"
         },
-        "0x3598d8ab": {
-          "erc20OfInterest": [],
-          "method": "sellEthForTokenToUniswapV3",
+        "0x1342555a": {
+          "erc20OfInterest": ["tokenIn", "tokenOut"],
+          "method": "sailAdapterSwap",
           "plugin": "changelly"
         },
-        "0x803ba26d": {
-          "erc20OfInterest": [],
-          "method": "sellTokenForEthToUniswapV3",
+        "0x9479c206": {
+          "erc20OfInterest": ["tokenIn", "tokenOut"],
+          "method": "sailAdapterSwapWithFee",
           "plugin": "changelly"
         },
-        "0xc43c9ef6": {
-          "erc20OfInterest": ["tokens.0", "tokens.1"],
-          "method": "sellToPancakeSwap",
-          "plugin": "changelly"
-        },
-        "0x6af479b2": {
-          "erc20OfInterest": [],
-          "method": "sellTokenForTokenToUniswapV3",
+        "0x351eb598": {
+          "erc20OfInterest": ["inputToken", "outputToken"],
+          "method": "anyRecipientTransformERC20",
           "plugin": "changelly"
         }
       }

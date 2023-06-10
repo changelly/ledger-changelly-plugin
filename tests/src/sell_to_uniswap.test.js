@@ -1,4 +1,3 @@
-import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 import { waitForAppScreen, zemu, nano_models, txFromEtherscan } from './test.fixture';
 

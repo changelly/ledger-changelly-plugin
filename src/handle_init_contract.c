@@ -12,7 +12,8 @@ static int find_selector(uint32_t selector, const uint32_t *selectors, size_t n,
 
 // Called once to init.
 void handle_init_contract(void *parameters) {
-    // Cast the msg to the type of structure we expect (here, ethPluginInitContract_t).
+    // Cast the msg to the type of structure we expect (here,
+    // ethPluginInitContract_t).
     ethPluginInitContract_t *msg = (ethPluginInitContract_t *) parameters;
 
     // Make sure we are running a compatible version.
@@ -22,8 +23,8 @@ void handle_init_contract(void *parameters) {
         return;
     }
 
-    // Double check that the `context_t` struct is not bigger than the maximum size (defined by
-    // `msg->pluginContextLength`).
+    // Double check that the `context_t` struct is not bigger than the maximum
+    // size (defined by `msg->pluginContextLength`).
     if (msg->pluginContextLength < sizeof(context_t)) {
         PRINTF("Plugin parameters structure is bigger than allowed size\n");
         msg->result = ETH_PLUGIN_RESULT_ERROR;
@@ -44,8 +45,6 @@ void handle_init_contract(void *parameters) {
     // Set `next_param` to be the first field we expect to parse.
     // to parse.
     switch (context->selectorIndex) {
-        case AGG_ROUTER_SWAP_WITH_FEE:
-        case AGG_ROUTER_SWAP:
         case SELL_TO_UNISWAP:
         case SELL_ETH_FOR_TOKEN_TO_UNISWAP_V3:
         case SELL_TOKEN_FOR_ETH_TO_UNISWAP_V3:
@@ -56,6 +55,26 @@ void handle_init_contract(void *parameters) {
         case SELL_TO_LIQUIDITY_PROVIDER:
         case TRANSFORM_ERC20:
             context->next_param = INPUT_TOKEN;
+            break;
+        case SAIL_ADAPTER_SWAP:
+        case SAIL_ADAPTER_SWAP_WITH_FEE:
+            context->next_param = TARGET;
+            break;
+        case SAIL_UNISWAP_V3_SWAP:
+        case SAIL_UNISWAP_V3_SWAP_WITH_FEE:
+        case SAIL_UNISWAP_V3_SWAP_WITH_SLIPPAGE:
+        case SAIL_UNISWAP_V3_SWAP_WITH_FEE_AND_SLIPPAGE:
+            context->next_param = INPUT_AMOUNT;
+            break;
+        case SAIL_SPLIT_UNISWAP_V3_SWAP:
+        case SAIL_SPLIT_UNISWAP_V3_SWAP_WITH_FEE:
+        case SAIL_SPLIT_UNISWAP_V3_SWAP_WITH_SLIPPAGE:
+        case SAIL_SPLIT_UNISWAP_V3_SWAP_WITH_FEE_AND_SLIPPAGE:
+            context->next_param = OFFSET;
+            context->recieve_screen_only = true;
+            break;
+        case ANY_RECIPIENT_TRANSFORM_ERC20:
+            context->next_param = RECIPIENT;
             break;
         default:
             PRINTF("Missing selectorIndex: %d\n", context->selectorIndex);

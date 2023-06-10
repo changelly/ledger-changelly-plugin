@@ -19,10 +19,10 @@
 #include <stdint.h>
 #include <string.h>
 
-#include "os.h"
-#include "cx.h"
-
+#include "glyphs.h"
 #include "changelly_plugin.h"
+#include "cx.h"
+#include "os.h"
 
 // NATIVE TOKEN ADDRESS
 const uint8_t NATIVE_TOKEN_ADDRESS[ADDRESS_LENGTH] = {0xee, 0xee, 0xee, 0xee, 0xee, 0xee, 0xee,
@@ -32,24 +32,48 @@ const uint8_t NATIVE_TOKEN_ADDRESS[ADDRESS_LENGTH] = {0xee, 0xee, 0xee, 0xee, 0x
 static const uint32_t SELL_TO_UNISWAP_SELECTOR = 0xd9627aa4;
 static const uint32_t SELL_TO_LIQUIDITY_PROVIDER_SELECTOR = 0xf7fcd384;
 static const uint32_t TRANSFORM_ERC20_SELECTOR = 0x415565b0;
-static const uint32_t AGG_ROUTER_SWAP_SELECTOR = 0x97b3c273;
-static const uint32_t AGG_ROUTER_SWAP_WITH_FEE_SELECTOR = 0xef28e668;
+static const uint32_t SAIL_ADAPTER_SWAP_SELECTOR = 0x1342555a;
+static const uint32_t SAIL_ADAPTER_SWAP_WITH_FEE_SELECTOR = 0x9479c206;
 static const uint32_t SELL_ETH_FOR_TOKEN_TO_UNISWAP_V3_SELECTOR = 0x3598d8ab;
 static const uint32_t SELL_TOKEN_FOR_ETH_TO_UNISWAP_V3_SELECTOR = 0x803ba26d;
 static const uint32_t SELL_TOKEN_FOR_TOKEN_TO_UNISWAP_V3_SELECTOR = 0x6af479b2;
 static const uint32_t SELL_TO_PANCAKESWAP_SELECTOR = 0xc43c9ef6;
+static const uint32_t SAIL_UNISWAP_V3_SWAP_SELECTOR = 0x1b328275;
+static const uint32_t SAIL_UNISWAP_V3_SWAP_WITH_FEE_SELECTOR = 0xb8c329fc;
+static const uint32_t SAIL_UNISWAP_V3_SWAP_WITH_SLIPPAGE_SELECTOR = 0x4fe82bb9;
+static const uint32_t SAIL_UNISWAP_V3_SWAP_WITH_FEE_AND_SLIPPAGE_SELECTOR = 0x6100f308;
+static const uint32_t SAIL_SPLIT_UNISWAP_V3_SWAP_SELECTOR = 0x318ced5d;
+static const uint32_t SAIL_SPLIT_UNISWAP_V3_SWAP_WITH_FEE_SELECTOR = 0x985852c5;
+static const uint32_t SAIL_SPLIT_UNISWAP_V3_SWAP_WITH_SLIPPAGE_SELECTOR = 0x8253ac8b;
+static const uint32_t SAIL_SPLIT_UNISWAP_V3_SWAP_WITH_FEE_AND_SLIPPAGE_SELECTOR = 0x5bd4e83c;
+static const uint32_t ANY_RECIPIENT_TRANSFORM_ERC20_SELECTOR = 0x351eb598;
 
 // Array of Changelly selectors. Make sure this follows the same order as the
 // enum defined in `chnagelly_plugin.h`
-const uint32_t CHANGELLY_SELECTORS[NUM_SELECTORS] = {SELL_TO_UNISWAP_SELECTOR,
-                                                     SELL_TO_LIQUIDITY_PROVIDER_SELECTOR,
-                                                     TRANSFORM_ERC20_SELECTOR,
-                                                     AGG_ROUTER_SWAP_SELECTOR,
-                                                     AGG_ROUTER_SWAP_WITH_FEE_SELECTOR,
-                                                     SELL_ETH_FOR_TOKEN_TO_UNISWAP_V3_SELECTOR,
-                                                     SELL_TOKEN_FOR_ETH_TO_UNISWAP_V3_SELECTOR,
-                                                     SELL_TOKEN_FOR_TOKEN_TO_UNISWAP_V3_SELECTOR,
-                                                     SELL_TO_PANCAKESWAP_SELECTOR};
+const uint32_t CHANGELLY_SELECTORS[NUM_SELECTORS] = {
+    SELL_TO_UNISWAP_SELECTOR,
+    SELL_TO_LIQUIDITY_PROVIDER_SELECTOR,
+    TRANSFORM_ERC20_SELECTOR,
+    SAIL_ADAPTER_SWAP_SELECTOR,
+    SAIL_ADAPTER_SWAP_WITH_FEE_SELECTOR,
+    SELL_ETH_FOR_TOKEN_TO_UNISWAP_V3_SELECTOR,
+    SELL_TOKEN_FOR_ETH_TO_UNISWAP_V3_SELECTOR,
+    SELL_TOKEN_FOR_TOKEN_TO_UNISWAP_V3_SELECTOR,
+    SELL_TO_PANCAKESWAP_SELECTOR,
+    SAIL_UNISWAP_V3_SWAP_SELECTOR,
+    SAIL_UNISWAP_V3_SWAP_WITH_FEE_SELECTOR,
+    SAIL_UNISWAP_V3_SWAP_WITH_SLIPPAGE_SELECTOR,
+    SAIL_UNISWAP_V3_SWAP_WITH_FEE_AND_SLIPPAGE_SELECTOR,
+    SAIL_SPLIT_UNISWAP_V3_SWAP_SELECTOR,
+    SAIL_SPLIT_UNISWAP_V3_SWAP_WITH_FEE_SELECTOR,
+    SAIL_SPLIT_UNISWAP_V3_SWAP_WITH_SLIPPAGE_SELECTOR,
+    SAIL_SPLIT_UNISWAP_V3_SWAP_WITH_FEE_AND_SLIPPAGE_SELECTOR,
+    ANY_RECIPIENT_TRANSFORM_ERC20_SELECTOR};
+
+// Used to indicate that the recipient should be the sender.
+const uint8_t NULL_ETH_ADDRESS[ADDRESS_LENGTH] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                                  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                                  0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
 // Function to dispatch calls from the ethereum app.
 void dispatch_plugin_calls(int message, void *parameters) {
@@ -90,10 +114,26 @@ void handle_query_ui_exception(unsigned int *args) {
 
 // Calls the ethereum app.
 void call_app_ethereum() {
-    unsigned int libcall_params[3];
+    unsigned int libcall_params[5];
     libcall_params[0] = (unsigned int) "Ethereum";
     libcall_params[1] = 0x100;
     libcall_params[2] = RUN_APPLICATION;
+    libcall_params[3] = (unsigned int) NULL;
+#ifdef HAVE_NBGL
+    caller_app_t capp;
+    const char name[] = APPNAME;
+    nbgl_icon_details_t icon_details;
+    uint8_t bitmap[sizeof(ICONBITMAP)];
+
+    memcpy(&icon_details, &ICONGLYPH, sizeof(ICONGLYPH));
+    memcpy(&bitmap, &ICONBITMAP, sizeof(bitmap));
+    icon_details.bitmap = (const uint8_t *) bitmap;
+    capp.name = (const char *) name;
+    capp.icon = &icon_details;
+    libcall_params[4] = (unsigned int) &capp;
+#else
+    libcall_params[4] = (unsigned int) NULL;
+#endif
     os_lib_call((unsigned int *) &libcall_params);
 }
 
@@ -105,7 +145,8 @@ __attribute__((section(".boot"))) int main(int arg0) {
     // Ensure exception will work as planned
     os_boot();
 
-    // Try catch block. Please read the docs for more information on how to use those!
+    // Try catch block. Please read the docs for more information on how to use
+    // those!
     BEGIN_TRY {
         TRY {
             // Low-level black magic.
@@ -120,8 +161,9 @@ __attribute__((section(".boot"))) int main(int arg0) {
                 // Not called from dashboard: called from the ethereum app!
                 const unsigned int *args = (const unsigned int *) arg0;
 
-                // If `ETH_PLUGIN_CHECK_PRESENCE` is set, this means the caller is just trying to
-                // know whether this app exists or not. We can skip `dispatch_plugin_calls`.
+                // If `ETH_PLUGIN_CHECK_PRESENCE` is set, this means the caller is just
+                // trying to know whether this app exists or not. We can skip
+                // `dispatch_plugin_calls`.
                 if (args[0] != ETH_PLUGIN_CHECK_PRESENCE) {
                     dispatch_plugin_calls(args[0], (void *) args[1]);
                 }

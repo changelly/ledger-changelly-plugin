@@ -28,6 +28,14 @@ static void fill_output_token_as_eth(context_t *context) {
     PRINTF("TOKEN RECEIVED: %.*H\n", ADDRESS_LENGTH, context->output_token);
 }
 
+static void handle_recipient(const ethPluginProvideParameter_t *msg, context_t *context) {
+    memset(context->recipient, 0, sizeof(context->recipient));
+    memcpy(context->recipient,
+           &msg->parameter[PARAMETER_LENGTH - ADDRESS_LENGTH],
+           sizeof(context->recipient));
+    PRINTF("RECIPIENT: %.*H\n", ADDRESS_LENGTH, context->recipient);
+}
+
 static void handle_transform_erc20(ethPluginProvideParameter_t *msg, context_t *context) {
     switch (context->next_param) {
         case INPUT_TOKEN:
@@ -96,8 +104,11 @@ static void handle_sell_to_liquidity_provider(ethPluginProvideParameter_t *msg,
     }
 }
 
-static void handle_agg_router_swap(ethPluginProvideParameter_t *msg, context_t *context) {
+static void handle_sail_adapter_swap(ethPluginProvideParameter_t *msg, context_t *context) {
     switch (context->next_param) {
+        case TARGET:
+            context->next_param = OFFSET;
+            break;
         case OFFSET:
             context->next_param = INPUT_TOKEN;
             break;
@@ -117,6 +128,10 @@ static void handle_agg_router_swap(ethPluginProvideParameter_t *msg, context_t *
             copy_parameter(context->min_output_amount,
                            msg->parameter,
                            sizeof(context->min_output_amount));
+            context->next_param = RECIPIENT;
+            break;
+        case RECIPIENT:
+            handle_recipient(msg, context);
             context->next_param = SKIP;
             break;
         case SKIP:
@@ -210,8 +225,8 @@ static void handle_sell_to_uniswap(ethPluginProvideParameter_t *msg, context_t *
     }
 }
 
-static void handle_sell_eth_for_token_to_uniswap_v3(
-    ethPluginProvideParameter_t *msg, context_t *context) {
+static void handle_sell_eth_for_token_to_uniswap_v3(ethPluginProvideParameter_t *msg,
+                                                    context_t *context) {
     switch (context->next_param) {
         case OFFSET:
             fill_input_token_as_eth(context);
@@ -232,8 +247,8 @@ static void handle_sell_eth_for_token_to_uniswap_v3(
     }
 }
 
-static void handle_sell_token_for_eth_uniswap_v3(
-    ethPluginProvideParameter_t *msg, context_t *context) {
+static void handle_sell_token_for_eth_uniswap_v3(ethPluginProvideParameter_t *msg,
+                                                 context_t *context) {
     switch (context->next_param) {
         case OFFSET:
             context->next_param = INPUT_AMOUNT;
@@ -258,10 +273,85 @@ static void handle_sell_token_for_eth_uniswap_v3(
     }
 }
 
-static void handle_sell_token_for_token_uniswap_v3(
-    ethPluginProvideParameter_t *msg, context_t *context) {
+static void handle_sell_token_for_token_uniswap_v3(ethPluginProvideParameter_t *msg,
+                                                   context_t *context) {
     switch (context->next_param) {
         case OFFSET:
+            context->next_param = INPUT_AMOUNT;
+            break;
+        case INPUT_AMOUNT:
+            copy_parameter(context->input_amount, msg->parameter, sizeof(context->input_amount));
+            context->next_param = MIN_OUTPUT_AMOUNT;
+            break;
+        case MIN_OUTPUT_AMOUNT:
+            copy_parameter(context->min_output_amount,
+                           msg->parameter,
+                           sizeof(context->min_output_amount));
+            context->next_param = SKIP;
+            break;
+        case SKIP:
+            break;
+        default:
+            PRINTF("Param not supported: %d\n", context->next_param);
+            msg->result = ETH_PLUGIN_RESULT_ERROR;
+            break;
+    }
+}
+
+static void handle_sail_uniswap_v3_swap(ethPluginProvideParameter_t *msg, context_t *context) {
+    switch (context->next_param) {
+        case INPUT_AMOUNT:
+            copy_parameter(context->input_amount, msg->parameter, sizeof(context->input_amount));
+            context->next_param = MIN_OUTPUT_AMOUNT;
+            break;
+        case MIN_OUTPUT_AMOUNT:
+            copy_parameter(context->min_output_amount,
+                           msg->parameter,
+                           sizeof(context->min_output_amount));
+            context->next_param = SKIP;
+            break;
+        case SKIP:
+            break;
+        default:
+            PRINTF("Param not supported: %d\n", context->next_param);
+            msg->result = ETH_PLUGIN_RESULT_ERROR;
+            break;
+    }
+}
+
+static void handle_sail_split_uniswap_v3_swap(ethPluginProvideParameter_t *msg,
+                                              context_t *context) {
+    switch (context->next_param) {
+        case OFFSET:
+            context->next_param = MIN_OUTPUT_AMOUNT;
+            break;
+        case MIN_OUTPUT_AMOUNT:
+            copy_parameter(context->min_output_amount,
+                           msg->parameter,
+                           sizeof(context->min_output_amount));
+            context->next_param = SKIP;
+            break;
+        case SKIP:
+            break;
+        default:
+            PRINTF("Param not supported: %d\n", context->next_param);
+            msg->result = ETH_PLUGIN_RESULT_ERROR;
+            break;
+    }
+}
+
+static void handle_any_recipient_swap(ethPluginProvideParameter_t *msg, context_t *context) {
+    switch (context->next_param) {
+        case RECIPIENT:
+            handle_recipient(msg, context);
+            context->next_param = INPUT_TOKEN;
+            break;
+        case INPUT_TOKEN:
+            handle_input_token(msg, context);
+            context->next_param = OUTPUT_TOKEN;
+            break;
+        case OUTPUT_TOKEN:
+            handle_output_token(msg, context);
             context->next_param = INPUT_AMOUNT;
             break;
         case INPUT_AMOUNT:
@@ -287,8 +377,8 @@ void handle_provide_parameter(void *parameters) {
     ethPluginProvideParameter_t *msg = (ethPluginProvideParameter_t *) parameters;
     context_t *context = (context_t *) msg->pluginContext;
     // We use `%.*H`: it's a utility function to print bytes. You first give
-    // the number of bytes you wish to print (in this case, `PARAMETER_LENGTH`) and then
-    // the address (here `msg->parameter`).
+    // the number of bytes you wish to print (in this case, `PARAMETER_LENGTH`)
+    // and then the address (here `msg->parameter`).
     PRINTF("Changelly plugin provide parameter: offset %d\nBytes: %.*H\n",
            msg->parameterOffset,
            PARAMETER_LENGTH,
@@ -299,10 +389,6 @@ void handle_provide_parameter(void *parameters) {
     switch (context->selectorIndex) {
         case TRANSFORM_ERC20:
             handle_transform_erc20(msg, context);
-            break;
-        case AGG_ROUTER_SWAP_WITH_FEE:
-        case AGG_ROUTER_SWAP:
-            handle_agg_router_swap(msg, context);
             break;
         case SELL_TO_UNISWAP:
             handle_sell_to_uniswap(msg, context);
@@ -321,6 +407,25 @@ void handle_provide_parameter(void *parameters) {
             break;
         case SELL_TO_PANCAKESWAP:
             handle_sell_to_pancakeswap(msg, context);
+            break;
+        case SAIL_ADAPTER_SWAP:
+        case SAIL_ADAPTER_SWAP_WITH_FEE:
+            handle_sail_adapter_swap(msg, context);
+            break;
+        case SAIL_UNISWAP_V3_SWAP:
+        case SAIL_UNISWAP_V3_SWAP_WITH_FEE:
+        case SAIL_UNISWAP_V3_SWAP_WITH_SLIPPAGE:
+        case SAIL_UNISWAP_V3_SWAP_WITH_FEE_AND_SLIPPAGE:
+            handle_sail_uniswap_v3_swap(msg, context);
+            break;
+        case SAIL_SPLIT_UNISWAP_V3_SWAP:
+        case SAIL_SPLIT_UNISWAP_V3_SWAP_WITH_FEE:
+        case SAIL_SPLIT_UNISWAP_V3_SWAP_WITH_SLIPPAGE:
+        case SAIL_SPLIT_UNISWAP_V3_SWAP_WITH_FEE_AND_SLIPPAGE:
+            handle_sail_split_uniswap_v3_swap(msg, context);
+            break;
+        case ANY_RECIPIENT_TRANSFORM_ERC20:
+            handle_any_recipient_swap(msg, context);
             break;
         default:
             PRINTF("Selector Index not supported: %d\n", context->selectorIndex);

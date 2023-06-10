@@ -17,8 +17,10 @@ void handle_provide_token(void *parameters) {
     } else {
         // Did not find the token and token is not ETH.
         context->input_decimals = DEFAULT_DECIMAL;
-        // We will need an additional screen to display a warning message.
-        msg->additionalScreens++;
+        if (!context->recieve_screen_only) {
+            // We will need an additional screen to display a warning message.
+            msg->additionalScreens++;
+        }
     }
 
     if (ADDRESS_IS_NETWORK_TOKEN(context->output_token)) {

@@ -42,6 +42,19 @@ static void set_receive_ui(ethQueryContractUI_t *msg, const context_t *context) 
                    msg->msgLength);
 }
 
+// Set UI for "Recipient" screen.
+static void set_recipient_ui(ethQueryContractUI_t *msg, context_t *context) {
+    strlcpy(msg->title, "Recipient", msg->titleLength);
+
+    msg->msg[0] = '0';
+    msg->msg[1] = 'x';
+
+    getEthAddressStringFromBinary((uint8_t *) context->recipient,
+                                  msg->msg + 2,
+                                  msg->pluginSharedRW->sha3,
+                                  0);
+}
+
 // Set UI for "Warning" screen.
 static void set_warning_ui(ethQueryContractUI_t *msg,
                            const context_t *context __attribute__((unused))) {
@@ -49,7 +62,8 @@ static void set_warning_ui(ethQueryContractUI_t *msg,
     strlcpy(msg->msg, "Unknown token", msg->msgLength);
 }
 
-// Helper function that returns the enum corresponding to the screen that should be displayed.
+// Helper function that returns the enum corresponding to the screen that should
+// be displayed.
 static screens_t get_screen(const ethQueryContractUI_t *msg, const context_t *context) {
     uint8_t index = msg->screenIndex;
 
@@ -61,7 +75,9 @@ static screens_t get_screen(const ethQueryContractUI_t *msg, const context_t *co
 
     switch (index) {
         case 0:
-            if (both_tokens_found) {
+            if (context->recieve_screen_only) {
+                return WARN_SCREEN;
+            } else if (both_tokens_found) {
                 return SEND_SCREEN;
             } else if (both_tokens_not_found) {
                 return WARN_SCREEN;
@@ -72,7 +88,9 @@ static screens_t get_screen(const ethQueryContractUI_t *msg, const context_t *co
             }
             break;
         case 1:
-            if (both_tokens_found) {
+            if (context->recieve_screen_only) {
+                return RECEIVE_SCREEN;
+            } else if (both_tokens_found) {
                 return RECEIVE_SCREEN;
             } else if (both_tokens_not_found) {
                 return SEND_SCREEN;
@@ -83,7 +101,9 @@ static screens_t get_screen(const ethQueryContractUI_t *msg, const context_t *co
             }
             break;
         case 2:
-            if (both_tokens_not_found) {
+            if (both_tokens_found) {
+                return RECIPIENT_SCREEN;
+            } else if (both_tokens_not_found) {
                 return WARN_SCREEN;
             } else {
                 return RECEIVE_SCREEN;
@@ -92,8 +112,17 @@ static screens_t get_screen(const ethQueryContractUI_t *msg, const context_t *co
         case 3:
             if (both_tokens_found) {
                 return ERROR;
-            } else {
+            } else if (both_tokens_not_found) {
                 return RECEIVE_SCREEN;
+            } else {
+                return RECIPIENT_SCREEN;
+            }
+            break;
+        case 4:
+            if (both_tokens_not_found) {
+                return RECIPIENT_SCREEN;
+            } else {
+                return ERROR;
             }
             break;
         default:
@@ -124,6 +153,9 @@ void handle_query_contract_ui(void *parameters) {
             break;
         case RECEIVE_SCREEN:
             set_receive_ui(msg, context);
+            break;
+        case RECIPIENT_SCREEN:
+            set_recipient_ui(msg, context);
             break;
         case WARN_SCREEN:
             set_warning_ui(msg, context);
