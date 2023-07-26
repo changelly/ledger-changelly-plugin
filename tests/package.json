@@ -15,7 +15,7 @@
     "@babel/plugin-proposal-class-properties": "~7.14.5",
     "@ledgerhq/hw-app-eth": "~6.33.7",
     "@ledgerhq/hw-transport-http": "~6.28.0",
-    "@ledgerhq/logs": "~6.2.0",
+    "@ledgerhq/logs": "~6.10.1",
     "@zondax/zemu": "~0.43.1",
     "core-js": "~3.31.1",
     "eslint": "~8.44.0",
