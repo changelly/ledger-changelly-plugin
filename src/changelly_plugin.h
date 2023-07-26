@@ -18,7 +18,7 @@ extern const uint8_t NATIVE_TOKEN_ADDRESS[ADDRESS_LENGTH];
 // Address 0x00000... used to indicate that the recipient is the sender.
 extern const uint8_t NULL_ETH_ADDRESS[ADDRESS_LENGTH];
 
-// Returns 1 if corresponding address is the Changelly address for the chain
+// Returns 1 if corresponding address is the Changelly address for the native chain
 // token (ETH, BNB, MATIC, etc.. are 0xeeeee...).
 #define ADDRESS_IS_NETWORK_TOKEN(_addr) (!memcmp(_addr, NATIVE_TOKEN_ADDRESS, ADDRESS_LENGTH))
 

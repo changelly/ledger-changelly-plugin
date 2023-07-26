@@ -17,6 +17,7 @@ void handle_provide_token(void *parameters) {
     } else {
         // Did not find the token and token is not ETH.
         context->input_decimals = DEFAULT_DECIMAL;
+        strlcpy(context->input_ticker, DEFAULT_TICKER, sizeof(context->input_ticker));
         if (!context->recieve_screen_only) {
             // We will need an additional screen to display a warning message.
             msg->additionalScreens++;
@@ -35,6 +36,7 @@ void handle_provide_token(void *parameters) {
     } else {
         // Did not find the token and token is not ETH.
         context->output_decimals = DEFAULT_DECIMAL;
+        strlcpy(context->output_ticker, DEFAULT_TICKER, sizeof(context->output_ticker));
         // We will need an additional screen to display a warning message.
         msg->additionalScreens++;
     }

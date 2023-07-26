@@ -9,7 +9,7 @@ void handle_finalize(void *parameters) {
     if ((context->selectorIndex == SAIL_ADAPTER_SWAP ||
          context->selectorIndex == SAIL_ADAPTER_SWAP_WITH_FEE ||
          context->selectorIndex == ANY_RECIPIENT_TRANSFORM_ERC20) &&
-        (strncmp(context->recipient, (const char *) NULL_ETH_ADDRESS, ADDRESS_LENGTH) != 0)) {
+        (memcmp(context->recipient, (const char *) NULL_ETH_ADDRESS, ADDRESS_LENGTH) != 0)) {
         // An addiitonal screen is required to display the `recipient` field.
         msg->numScreens += 1;
     }

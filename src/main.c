@@ -19,33 +19,103 @@
 #include <stdint.h>
 #include <string.h>
 
-#include "glyphs.h"
-#include "changelly_plugin.h"
-#include "cx.h"
 #include "os.h"
+#include "cx.h"
+
+#include "glyphs.h"
+
+#include "changelly_plugin.h"
 
 // NATIVE TOKEN ADDRESS
 const uint8_t NATIVE_TOKEN_ADDRESS[ADDRESS_LENGTH] = {0xee, 0xee, 0xee, 0xee, 0xee, 0xee, 0xee,
                                                       0xee, 0xee, 0xee, 0xee, 0xee, 0xee, 0xee,
                                                       0xee, 0xee, 0xee, 0xee, 0xee, 0xee};
 
+// Selector: sellToUniswap(address[],uint256,uint256,bool)
+// Full signature: function sellToUniswap(IERC20TokenV06[] calldata tokens, uint256
+// sellAmount,uint256 minBuyAmount,bool isSushi)
 static const uint32_t SELL_TO_UNISWAP_SELECTOR = 0xd9627aa4;
+// Selector: sellToLiquidityProvider(address,address,address,address,uint256,uint256,bytes)
+// Full signature: function sellToLiquidityProvider(IERC20TokenV06 inputToken,IERC20TokenV06
+// outputToken,ILiquidityProvider provider,address recipient,uint256 sellAmount,uint256
+// minBuyAmount,bytes calldata auxiliaryData)
 static const uint32_t SELL_TO_LIQUIDITY_PROVIDER_SELECTOR = 0xf7fcd384;
+// Selector: transformERC20(address,address,uint256,uint256,(uint32,bytes)[])
+// Full Signature: function transformERC20(IERC20TokenV06 inputToken,IERC20TokenV06
+// outputToken,uint256 inputTokenAmount,uint256 minOutputTokenAmount,Transformation[] memory
+// transformations)
 static const uint32_t TRANSFORM_ERC20_SELECTOR = 0x415565b0;
+// Selector: sailAdapterSwap(address,bytes,address,uint256,address,uint256,address)
+// Full Signature: function sailAdapterSwap(address target,bytes memory callData,IERC20TokenV06
+// tokenIn,uint256 tokenInAmount,IERC20TokenV06 tokenOut,uint256 minTokenOutAmount,address
+// tokenOutRecipient)
 static const uint32_t SAIL_ADAPTER_SWAP_SELECTOR = 0x1342555a;
+// Selector:
+// sailAdapterSwapWithFee(address,bytes,address,uint256,address,uint256,address,address,uint256)
+// Full Signature: function sailAdapterSwapWithFee(address target,bytes memory
+// callData,IERC20TokenV06 tokenIn,uint256 tokenInAmount,IERC20TokenV06 tokenOut,uint256
+// minTokenOutAmount,address tokenOutRecipient,address payable feeRecipient,uint256 feeAmount)
 static const uint32_t SAIL_ADAPTER_SWAP_WITH_FEE_SELECTOR = 0x9479c206;
+// Selector: sellEthForTokenToUniswapV3(bytes,uint256,address)
+// Full Signature: function sellEthForTokenToUniswapV3(bytes memory encodedPath,uint256
+// minBuyAmount,address recipient)
 static const uint32_t SELL_ETH_FOR_TOKEN_TO_UNISWAP_V3_SELECTOR = 0x3598d8ab;
+// Selector: sellTokenForEthToUniswapV3(bytes,uint256,uint256,address)
+// Full Signature: function sellTokenForEthToUniswapV3(bytes memory encodedPath,uint256
+// sellAmount,uint256 minBuyAmount,address payable recipient)
 static const uint32_t SELL_TOKEN_FOR_ETH_TO_UNISWAP_V3_SELECTOR = 0x803ba26d;
+// Selector: sellTokenForTokenToUniswapV3(bytes,uint256,uint256,address)
+// Full Signature: function sellTokenForTokenToUniswapV3(bytes memory encodedPath,uint256
+// sellAmount,uint256 minBuyAmount,address recipient)
 static const uint32_t SELL_TOKEN_FOR_TOKEN_TO_UNISWAP_V3_SELECTOR = 0x6af479b2;
+// Selector: sellToPancakeSwap(address[],uint256,uint256,uint8)
+// Full Signature: function sellToPancakeSwap(IERC20TokenV06[] calldata tokens,uint256
+// sellAmount,uint256 minBuyAmount,ProtocolFork fork)
 static const uint32_t SELL_TO_PANCAKESWAP_SELECTOR = 0xc43c9ef6;
+// Selector: sailUniswapV3Swap(uint256,uint256,uint256[])
+// Full Signature: function sailUniswapV3Swap(uint256 amount,uint256 minReturn,uint256[] memory
+// pools)
 static const uint32_t SAIL_UNISWAP_V3_SWAP_SELECTOR = 0x1b328275;
+// Selector: sailUniswapV3SwapWithFee(uint256,uint256,uint256[],address,uint256,address)
+// Full Signature: function sailUniswapV3SwapWithFee(uint256 swapAmount,uint256 minReturn,uint256[]
+// memory pools,IERC20 sellToken,uint256 sellTokenFeeAmount,address payable feeRecipient)
 static const uint32_t SAIL_UNISWAP_V3_SWAP_WITH_FEE_SELECTOR = 0xb8c329fc;
+// Selector: sailUniswapV3SwapWithSlippage(uint256,uint256,uint256,uint256[],address,address)
+// Full Signature:
 static const uint32_t SAIL_UNISWAP_V3_SWAP_WITH_SLIPPAGE_SELECTOR = 0x4fe82bb9;
+// Selector:
+// sailUniswapV3SwapWithFeeAndSlippage(uint256,uint256,uint256,uint256[],address,address,uint256,address,address)
+// Full Signature: function sailUniswapV3SwapWithFeeAndSlippage(uint256 swapAmount,uint256
+// minReturn,uint256 expectedAmount,uint256[] memory pools,IERC20 sellToken,IERC20 buyToken,uint256
+// sellTokenFeeAmount,address payable feeRecipient,address payable slippageRecipient)
 static const uint32_t SAIL_UNISWAP_V3_SWAP_WITH_FEE_AND_SLIPPAGE_SELECTOR = 0x6100f308;
+// Selector: sailSplitUniswapV3Swap(uint256[],uint256,uint256[][])
+// Full Signature:  function sailSplitUniswapV3Swap(uint256[] calldata amount,uint256
+// minReturn,uint256[][] calldata pools)
 static const uint32_t SAIL_SPLIT_UNISWAP_V3_SWAP_SELECTOR = 0x318ced5d;
+// Selector:
+// sailSplitUniswapV3SwapWithFee(uint256[],uint256,uint256[][],address,address,uint256,address) Full
+// Selector: function sailSplitUniswapV3SwapWithFee(uint256[] calldata amount,uint256
+// minReturn,uint256[][] calldata pools,IERC20 buyToken,IERC20 sellToken,uint256
+// sellTokenFeeAmount,address payable feeRecipient)
 static const uint32_t SAIL_SPLIT_UNISWAP_V3_SWAP_WITH_FEE_SELECTOR = 0x985852c5;
+// Selector:
+// sailSplitUniswapV3SwapWithSlippage(uint256[],uint256,uint256,uint256[][],address,address,address)
+// Full Signature: function sailSplitUniswapV3SwapWithSlippage(uint256[] calldata amount,uint256
+// minReturn,uint256 expectedAmount,uint256[][] calldata pools,IERC20 buyToken,IERC20
+// sellToken,address payable slippageRecipient)
 static const uint32_t SAIL_SPLIT_UNISWAP_V3_SWAP_WITH_SLIPPAGE_SELECTOR = 0x8253ac8b;
+// Selector:
+// sailSplitUniswapV3SwapWithFeeAndSlippage(uint256[],uint256,uint256,uint256[][],address,address,uint256,address,address)
+// Full Signature: function sailSplitUniswapV3SwapWithFeeAndSlippage(uint256[] memory amount,uint256
+// minReturn,uint256 expectedAmount,uint256[][] calldata pools,IERC20 sellToken,IERC20
+// buyToken,uint256 sellTokenFeeAmount,address payable feeRecipient,address payable
+// slippageRecipient)
 static const uint32_t SAIL_SPLIT_UNISWAP_V3_SWAP_WITH_FEE_AND_SLIPPAGE_SELECTOR = 0x5bd4e83c;
+// Selector: anyRecipientTransformERC20(address,address,address,uint256,uint256,(uint32,bytes)[])
+// Full Signature: function anyRecipientTransformERC20(address payable recipient,IERC20TokenV06
+// inputToken,IERC20TokenV06 outputToken,uint256 inputTokenAmount,uint256
+// minOutputTokenAmount,ITransformERC20Feature.Transformation[] memory transformations)
 static const uint32_t ANY_RECIPIENT_TRANSFORM_ERC20_SELECTOR = 0x351eb598;
 
 // Array of Changelly selectors. Make sure this follows the same order as the
@@ -115,6 +185,7 @@ void handle_query_ui_exception(unsigned int *args) {
 // Calls the ethereum app.
 void call_app_ethereum() {
     unsigned int libcall_params[5];
+
     libcall_params[0] = (unsigned int) "Ethereum";
     libcall_params[1] = 0x100;
     libcall_params[2] = RUN_APPLICATION;

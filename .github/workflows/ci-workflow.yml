@@ -24,9 +24,9 @@ jobs:
           - sdk: "$STAX_SDK"
             name: "stax"
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     container:
-      image: ghcr.io/ledgerhq/ledger-app-builder/ledger-app-builder-lite:latest
+      image: ghcr.io/ledgerhq/ledger-app-builder/ledger-app-builder-lite:3.1.0
 
     steps:
       - name: Clone
@@ -40,9 +40,9 @@ jobs:
 
   job_scan_build:
     name: Clang Static Analyzer
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     container:
-      image: ghcr.io/ledgerhq/ledger-app-builder/ledger-app-builder-lite:latest
+      image: ghcr.io/ledgerhq/ledger-app-builder/ledger-app-builder-lite:3.1.0
 
     steps:
       - uses: actions/checkout@v3
@@ -71,9 +71,9 @@ jobs:
           - sdk: "$NANOSP_SDK"
             name: "nanosp"
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     container:
-      image: ghcr.io/ledgerhq/ledger-app-builder/ledger-app-builder-lite:latest
+      image: ghcr.io/ledgerhq/ledger-app-builder/ledger-app-builder-lite:3.1.0
 
     steps:
       - name: Clone
@@ -107,9 +107,9 @@ jobs:
           - sdk: "$NANOSP_SDK"
             name: "nanosp"
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     container:
-      image: ghcr.io/ledgerhq/ledger-app-builder/ledger-app-builder-lite:latest
+      image: ghcr.io/ledgerhq/ledger-app-builder/ledger-app-builder-lite:3.1.0
 
     steps:
       - name: Checkout app-ethereum
@@ -135,7 +135,7 @@ jobs:
   jobs-e2e-tests:
     name: E2E Tests
     needs: [job_build_debug_plugin, job_build_debug_app]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -160,4 +160,4 @@ jobs:
 
       - name: Run Zemu tests
         run: |
-          cd tests && docker pull zondax/builder-zemu@sha256:8d7b06cedf2d018b9464f4af4b7a8357c3fbb180f3ab153f8cb8f138defb22a4 && yarn test
+          cd tests && yarn test
