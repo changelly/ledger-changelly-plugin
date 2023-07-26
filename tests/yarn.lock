@@ -971,10 +971,10 @@
     "@babel/types" "^7.4.4"
     esutils "^2.0.2"
 
-"@babel/preset-stage-0@~7.0.0":
-  version "7.0.0"
-  resolved "https://registry.yarnpkg.com/@babel/preset-stage-0/-/preset-stage-0-7.0.0.tgz#999aaec79ee8f0a763042c68c06539c97c6e0646"
-  integrity sha512-FBMd0IiARPtH5aaOFUVki6evHiJQiY0pFy7fizyRF7dtwc+el3nwpzvhb9qBNzceG1OIJModG1xpE0DDFjPXwA==
+"@babel/preset-stage-0@~7.8.3":
+  version "7.8.3"
+  resolved "https://registry.yarnpkg.com/@babel/preset-stage-0/-/preset-stage-0-7.8.3.tgz#b6a0eca1a3b72e07f9caf58f998e97568028f6f5"
+  integrity sha512-+l6FlG1j73t4wh78W41StbcCz0/9a1/y+vxfnjtHl060kSmcgMfGzK9MEkLvrCOXfhp9RCX+d88sm6rOqxEIEQ==
 
 "@babel/register@~7.22.5":
   version "7.22.5"
